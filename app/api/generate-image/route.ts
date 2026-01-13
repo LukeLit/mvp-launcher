@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiGatewayKey = process.env.API_GATEWAY_KEY;
+    // Note: apiGatewayKey would be used here for real image generation
+    // const apiGatewayKey = process.env.API_GATEWAY_KEY;
     
     // If no API key is set, we'll still use the placeholder image generation
     // This allows the feature to work in development/demo mode

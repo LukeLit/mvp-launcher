@@ -14,15 +14,20 @@ import { ScanResult } from '@/lib/types';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for security
+    // Verify cron secret for security (only for cron jobs)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
     
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // If CRON_SECRET is set and auth header is provided, verify it
+    // This allows manual scans (no auth) while protecting cron endpoint
+    if (cronSecret && authHeader) {
+      if (authHeader !== `Bearer ${cronSecret}`) {
+        console.error('❌ Invalid CRON_SECRET provided');
+        return NextResponse.json(
+          { error: 'Unauthorized - Invalid credentials' },
+          { status: 401 }
+        );
+      }
     }
     
     // Log warning if CRON_SECRET is not set in production

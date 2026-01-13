@@ -29,15 +29,22 @@ export default function Home() {
     setError('');
 
     try {
+      console.log('🔍 Starting manual scan...');
       const response = await fetch('/api/scan', {
         method: 'POST',
       });
 
+      console.log(`📡 Response status: ${response.status}`);
+
       if (!response.ok) {
-        throw new Error(`Scan failed: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        console.error('❌ Scan failed:', errorMsg);
+        throw new Error(`Scan failed: ${errorMsg}`);
       }
 
       const data: ScanResult = await response.json();
+      console.log('✅ Scan complete:', data);
 
       if (data.error) {
         setError(data.error);
@@ -48,9 +55,13 @@ export default function Home() {
         // Cache results
         localStorage.setItem('trends', JSON.stringify(data.trends));
         localStorage.setItem('lastScan', data.timestamp);
+        
+        console.log(`📊 Found ${data.trends.length} trends`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to scan');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to scan';
+      console.error('❌ Error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setIsScanning(false);
     }
@@ -134,9 +145,27 @@ export default function Home() {
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-red-800 dark:text-red-200 text-sm">
-              <strong>Error:</strong> {error}
-            </p>
+            <div className="flex items-start gap-2">
+              <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-red-800 dark:text-red-200 text-sm font-medium">
+                  Error: {error}
+                </p>
+                <details className="mt-2">
+                  <summary className="text-xs text-red-700 dark:text-red-300 cursor-pointer hover:underline">
+                    Debugging tips
+                  </summary>
+                  <div className="mt-2 text-xs text-red-700 dark:text-red-300 space-y-1 pl-4">
+                    <p>• Check browser console (F12) for detailed logs</p>
+                    <p>• Verify API endpoint is accessible at /api/scan</p>
+                    <p>• Check Vercel function logs if deployed</p>
+                    <p>• Ensure environment variables are set (API_GATEWAY, SLACK_WEBHOOK)</p>
+                  </div>
+                </details>
+              </div>
+            </div>
           </div>
         )}
 

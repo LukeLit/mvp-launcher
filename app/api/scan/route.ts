@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
+import { logToBlob, createLogEntry } from '@/lib/logger';
 
 // Reddit Trend Scanner API Route
 // This endpoint scans Reddit for trending micro-SaaS ideas
 export async function GET() {
+  const startTime = Date.now();
+  
   try {
+    // Log scan start
+    await logToBlob(createLogEntry(
+      'scan',
+      'Starting Reddit scan',
+      { 
+        timestamp: new Date().toISOString(),
+        redditApiConfigured: !!(process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET),
+        aiGatewayConfigured: !!process.env.API_GATEWAY_KEY
+      }
+    ));
+
     // Mock implementation for now - returns sample trends
     // In production, this would:
     // 1. Authenticate with Reddit API using REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET
@@ -38,6 +52,20 @@ export async function GET() {
       }
     ];
 
+    const duration = Date.now() - startTime;
+    
+    // Log successful scan
+    await logToBlob(createLogEntry(
+      'scan',
+      `Scan completed: ${mockTrends.length} trends found (mock data)`,
+      { 
+        trendsFound: mockTrends.length,
+        duration: `${duration}ms`,
+        isMockData: true,
+        trends: mockTrends.map(t => ({ id: t.id, idea: t.idea, score: t.score }))
+      }
+    ));
+
     return NextResponse.json({
       success: true,
       data: mockTrends,
@@ -46,6 +74,17 @@ export async function GET() {
 
   } catch (error) {
     console.error('Error scanning trends:', error);
+    
+    // Log error
+    await logToBlob(createLogEntry(
+      'error',
+      'Scan failed',
+      { 
+        error: error instanceof Error ? error.message : String(error),
+        duration: `${Date.now() - startTime}ms`
+      }
+    ));
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,4 +1,5 @@
 import TrendsTable from '@/components/TrendsTable';
+import ChatConsole from '@/components/ChatConsole';
 
 export default function Home() {
   return (
@@ -15,6 +16,8 @@ export default function Home() {
 
         <TrendsTable />
       </div>
+      
+      <ChatConsole />
     </div>
   );
 }

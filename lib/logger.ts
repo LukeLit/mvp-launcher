@@ -45,7 +45,7 @@ export async function logToBlob(entry: LogEntry): Promise<void> {
   }
 }
 
-export async function getRecentLogs(limit = 50): Promise<LogEntry[]> {
+export async function getRecentLogs(limit = 100): Promise<LogEntry[]> {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
   
   if (!blobToken) {

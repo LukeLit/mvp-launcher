@@ -32,24 +32,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Build conversation context
-    const messages = [
-      {
-        role: 'user' as const,
-        content: `You are a helpful assistant for the MVP Launcher system. You help debug scanning operations, explain costs, and provide insights about Reddit trend scanning.
+    // Build conversation context with system prompt
+    const systemPrompt = `You are a helpful assistant for the MVP Launcher system. You help debug scanning operations, explain costs, and provide insights about Reddit trend scanning.
 
 Current system status:
 - Environment: ${process.env.NODE_ENV || 'development'}
 - API Gateway: ${apiGatewayKey ? 'Configured' : 'Not configured'}
 - Blob Storage: ${process.env.BLOB_READ_WRITE_TOKEN ? 'Configured' : 'Not configured'}
-- Slack Webhook: ${process.env.SLACK_WEBHOOK ? 'Configured' : 'Not configured'}
+- Slack Webhook: ${process.env.SLACK_WEBHOOK ? 'Configured' : 'Not configured'}`;
 
-User question: ${message}`
-      },
-      ...conversationHistory.map((msg: ChatMessage) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+    const messages = [
+      {
+        role: 'user' as const,
+        content: systemPrompt + '\n\nUser question: ' + message
+      }
     ];
 
     // Call API Gateway (Claude/Haiku)
@@ -65,7 +61,7 @@ User question: ${message}`
         body: JSON.stringify({
           model: 'claude-3-haiku-20240307',
           max_tokens: 1000,
-          messages: messages.slice(0, 1), // Only send the first message for now
+          messages,
         })
       }
     );

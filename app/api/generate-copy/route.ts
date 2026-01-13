@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { GeneratedCopy } from '@/types/trend';
 
+const DEFAULT_API_GATEWAY_URL = 'https://api.anthropic.com/v1/messages';
+
 export async function POST(request: NextRequest) {
   try {
     const { idea, summary } = await request.json();
@@ -44,24 +46,27 @@ Generate marketing copy with the following structure (respond with valid JSON on
 Focus on pain points solved, benefits delivered, and urgency. Make it conversion-optimized.`;
 
     // Call API Gateway (Claude/Haiku)
-    const response = await fetch(process.env.API_GATEWAY_URL || 'https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiGatewayKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 500,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
-      })
-    });
+    const response = await fetch(
+      process.env.API_GATEWAY_URL || DEFAULT_API_GATEWAY_URL,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiGatewayKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 500,
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        })
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -81,7 +86,13 @@ Focus on pain points solved, benefits delivered, and urgency. Make it conversion
       // Try to parse JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        generatedCopy = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        // Validate structure
+        if (parsed.headline && parsed.description && parsed.cta) {
+          generatedCopy = parsed;
+        } else {
+          throw new Error('Invalid JSON structure');
+        }
       } else {
         throw new Error('No JSON found in response');
       }

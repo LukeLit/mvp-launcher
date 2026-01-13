@@ -70,8 +70,12 @@ export default function DashboardPage() {
             : t
         );
         setTrends(updatedTrends);
-        setSelectedTrend({ ...trend, generated_copy: result.data });
-        setModalType('copy');
+        // Use the updated trend from the array
+        const updatedTrend = updatedTrends.find(t => t.id === trend.id);
+        if (updatedTrend) {
+          setSelectedTrend(updatedTrend);
+          setModalType('copy');
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate copy');
@@ -110,8 +114,12 @@ export default function DashboardPage() {
             : t
         );
         setTrends(updatedTrends);
-        setSelectedTrend({ ...trend, generated_image: result.data.imageUrl });
-        setModalType('image');
+        // Use the updated trend from the array
+        const updatedTrend = updatedTrends.find(t => t.id === trend.id);
+        if (updatedTrend) {
+          setSelectedTrend(updatedTrend);
+          setModalType('image');
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate image');

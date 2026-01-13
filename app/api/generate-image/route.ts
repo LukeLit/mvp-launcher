@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const IDEA_NAME_MAX_LENGTH = 30;
+
 export async function POST(request: NextRequest) {
   try {
     const { idea, summary } = await request.json();
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
       // });
       
       // For development, return a placeholder URL
-      return `https://placehold.co/1200x600/6366f1/white?text=${encodeURIComponent(idea.substring(0, 30))}`;
+      return `https://placehold.co/1200x600/6366f1/white?text=${encodeURIComponent(idea.substring(0, IDEA_NAME_MAX_LENGTH))}`;
     };
 
     const imageUrl = await mockImageGeneration();

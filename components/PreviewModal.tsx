@@ -19,12 +19,13 @@ export default function PreviewModal({ isOpen, onClose, title, children }: Previ
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      // Add overflow-hidden class to body instead of direct style manipulation
+      document.body.classList.add('overflow-hidden');
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.body.classList.remove('overflow-hidden');
     };
   }, [isOpen, onClose]);
 

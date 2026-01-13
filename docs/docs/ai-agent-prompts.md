@@ -1,6 +1,3 @@
-No worries, Luke—I can see how the nested code blocks (the prompts are in triple backticks inside the Markdown) are causing rendering issues in some viewers or when copying, making it look fragmented. To avoid that completely, I'll provide the full content of ai-agent-prompts.md below as plain text without any Markdown formatting or backticks. This way, you can copy it directly into a file, and it won't break. Once pasted into your editor (e.g., VS Code or GitHub), you can add back the Markdown syntax if needed (e.g., use # for headers, ** for bold, and triple backticks for code blocks).
-Save this as docs/ai-agent-prompts.md in your repo, commit, and push. If it still glitches, try a different editor or let me know your setup (e.g., browser vs local).
-Full Plain Text Content:
 Expanded AI Agent Prompts for MVP Launcher
 Based on the project summary, I've expanded the key AI agent prompts below. These are designed to be copy-paste ready for your Versal Gateway or similar setup, with more detail for clarity, error-handling, and optimization. I've included placeholders for your specific keys/configs, and structured them for models like Haiku (cheap, fast tasks) or DeepSeek V2 (code generation). Each prompt includes:
 

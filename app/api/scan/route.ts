@@ -8,10 +8,13 @@ import { ScanResult } from '@/lib/types';
  * Reddit Trend Scanner API Route
  * Fetches Reddit posts, analyzes with AI, and sends top trends to Slack
  * Designed to run hourly via Vercel cron
+ * 
+ * Security: Set CRON_SECRET environment variable to protect this endpoint
+ * from unauthorized access. Without it, the endpoint is publicly accessible.
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for security (optional but recommended)
+    // Verify cron secret for security
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
     
@@ -20,6 +23,11 @@ export async function GET(request: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+    
+    // Log warning if CRON_SECRET is not set in production
+    if (!cronSecret && process.env.NODE_ENV === 'production') {
+      console.warn('⚠️  CRON_SECRET not set - endpoint is publicly accessible');
     }
 
     console.log('🔍 Starting Reddit trend scan...');

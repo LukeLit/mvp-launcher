@@ -6,6 +6,7 @@ import { TrendIdea, RedditPost } from './types';
  */
 export async function analyzeWithAI(posts: RedditPost[]): Promise<TrendIdea[]> {
   const versalKey = process.env.VERSAL_KEY;
+  const versalApiUrl = process.env.VERSAL_API_URL || 'https://api.versal.ai/v1/chat/completions';
 
   if (!versalKey) {
     console.warn('VERSAL_KEY not configured, skipping AI analysis');
@@ -47,8 +48,8 @@ Handle errors: If data parse fails, output {error: "description"}.
 Input data: ${JSON.stringify(redditData, null, 2)}`;
 
   try {
-    // Call Versal Gateway (assuming it's a standard REST API)
-    const response = await fetch('https://api.versal.ai/v1/chat/completions', {
+    // Call Versal Gateway API (OpenAI-compatible format)
+    const response = await fetch(versalApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +72,15 @@ Input data: ${JSON.stringify(redditData, null, 2)}`;
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || data.content || '';
+    
+    // Parse response - Versal Gateway uses OpenAI-compatible format
+    // Response format: { choices: [{ message: { content: "..." } }] }
+    const content = data.choices?.[0]?.message?.content;
+    
+    if (!content) {
+      console.error('Invalid response format from Versal API');
+      return [];
+    }
 
     // Extract JSON from the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);

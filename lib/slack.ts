@@ -1,6 +1,13 @@
 import { TrendIdea } from './types';
 
 /**
+ * Slack Block Kit types
+ * Note: Using 'any' for flexibility with Slack's complex block structure.
+ * For production, consider using @slack/web-api SDK for full type safety.
+ */
+type SlackBlock = Record<string, unknown>;
+
+/**
  * Sends notification to Slack webhook with top trends
  */
 export async function notifySlack(trends: TrendIdea[]): Promise<void> {
@@ -19,9 +26,9 @@ export async function notifySlack(trends: TrendIdea[]): Promise<void> {
     return;
   }
 
-  // Format trends for Slack
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const blocks: any[] = [
+  // Format trends for Slack using Block Kit
+  // Using flexible typing for Slack blocks - see type definition above
+  const blocks: SlackBlock[] = [
     {
       type: 'header',
       text: {

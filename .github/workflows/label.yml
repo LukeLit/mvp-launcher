@@ -1,0 +1,40 @@
+# This workflow will triage pull requests and apply a label based on the
+# paths that are modified in the pull request.
+#
+# To use this workflow, you will need to set up a .github/labeler.yml
+# file with configuration for your repositories, as well as labels in
+# your repository that match /some-label/. See the documentation for
+# more information.
+# Ref: https://github.com/actions/labeler
+
+name: Labeler
+on: [pull_request_target]
+
+jobs:
+  label:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/labeler@v5
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+# Add this to .github/labeler.yml (create if missing) for custom labels:
+# Example customizations for our project
+ui:  # Label for UI/landing changes
+  - app/**.tsx
+  - components/**
+
+generated:  # For AI-generated code/PRs
+  - app/**  # Broad match; refine as needed
+
+scan:  # For trend scanner updates
+  - api/scan/**
+
+mvp:  # For full MVP builds
+  - app/dashboard/**

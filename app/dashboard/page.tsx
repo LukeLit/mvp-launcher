@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateCopy = async (trend: Trend) => {
-    setLoading({ ...loading, [`copy-${trend.id}`]: true });
+    setLoading(prev => ({ ...prev, [`copy-${trend.id}`]: true }));
     setError(null);
 
     try {
@@ -80,12 +80,12 @@ export default function DashboardPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate copy');
     } finally {
-      setLoading({ ...loading, [`copy-${trend.id}`]: false });
+      setLoading(prev => ({ ...prev, [`copy-${trend.id}`]: false }));
     }
   };
 
   const handleGenerateImage = async (trend: Trend) => {
-    setLoading({ ...loading, [`image-${trend.id}`]: true });
+    setLoading(prev => ({ ...prev, [`image-${trend.id}`]: true }));
     setError(null);
 
     try {
@@ -124,7 +124,7 @@ export default function DashboardPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate image');
     } finally {
-      setLoading({ ...loading, [`image-${trend.id}`]: false });
+      setLoading(prev => ({ ...prev, [`image-${trend.id}`]: false }));
     }
   };
 

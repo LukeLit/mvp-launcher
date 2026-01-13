@@ -13,12 +13,8 @@ export async function POST(request: NextRequest) {
 
     const apiGatewayKey = process.env.API_GATEWAY_KEY;
     
-    if (!apiGatewayKey) {
-      return NextResponse.json(
-        { error: 'API_GATEWAY_KEY not configured' },
-        { status: 500 }
-      );
-    }
+    // If no API key is set, we'll still use the placeholder image generation
+    // This allows the feature to work in development/demo mode
 
     // Prepare the prompt for image generation
     const imagePrompt = `A modern, sleek hero image for a SaaS product: ${idea}. ${summary}. Professional UI design, tech-focused, clean aesthetic, suitable for a landing page hero section.`;

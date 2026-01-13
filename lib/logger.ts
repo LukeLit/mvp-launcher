@@ -88,7 +88,7 @@ export function createLogEntry(
   tokenUsage?: TokenUsage
 ): LogEntry {
   return {
-    id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
     timestamp: new Date().toISOString(),
     type,
     message,

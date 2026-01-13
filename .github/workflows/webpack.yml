@@ -1,0 +1,38 @@
+name: Node.js CI (Next.js Build & Test)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]  # Keep multi-version testing—good for compatibility
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'  # Cache node_modules for faster installs
+
+    - name: Install dependencies
+      run: npm ci  # Faster and more reliable than npm install
+
+    - name: Build
+      run: npm run build  # This runs "next build" from package.json
+
+    # Optional: Add lint if you have ESLint (uncomment if you do)
+    # - name: Lint
+    #   run: npm run lint
+
+    # Optional: Add tests if you add any (uncomment later)
+    # - name: Test
+    #   run: npm test

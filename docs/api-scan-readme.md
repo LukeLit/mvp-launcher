@@ -10,7 +10,7 @@ This API endpoint scans Reddit for trending micro-SaaS ideas and sends notificat
 
 - ✅ Fetches hot posts from multiple subreddits (r/SaaS, r/indiehackers, r/SideProject, r/Entrepreneur)
 - ✅ Filters posts from the last 24 hours with minimum engagement (10+ upvotes, 3+ comments)
-- ✅ Uses AI (Haiku via Versal Gateway) to analyze and rank trending ideas
+- ✅ Uses AI (Haiku via Vercel Gateway) to analyze and rank trending ideas
 - ✅ Sends formatted notifications to Slack with top trends
 - ✅ Runs automatically every hour via Vercel cron
 - ✅ Comprehensive error handling with Slack notifications
@@ -20,8 +20,8 @@ This API endpoint scans Reddit for trending micro-SaaS ideas and sends notificat
 Required environment variables (add to Vercel project settings):
 
 ```bash
-# Versal Gateway API key for AI analysis
-VERSAL_KEY=your_versal_api_key_here
+# Vercel Gateway API key for AI analysis
+API_GATEWAY=your_vercel_gateway_api_key_here
 
 # Slack webhook URL for notifications
 SLACK_WEBHOOK=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
@@ -92,8 +92,8 @@ Error response:
    - Fetches hot posts from multiple subreddits
    - Filters by recency and engagement
 
-2. **AI Analysis** (`lib/versal.ts`)
-   - Calls Versal Gateway API with Haiku model
+2. **AI Analysis** (`lib/vercel-gateway.ts`)
+   - Calls Vercel Gateway API with Haiku model
    - Analyzes posts for micro-SaaS opportunities
    - Ranks and filters top 5 trends
 

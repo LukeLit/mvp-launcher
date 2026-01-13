@@ -1,15 +1,15 @@
 import { TrendIdea, RedditPost } from './types';
 
 /**
- * Calls Versal Gateway API to analyze Reddit posts using Haiku model
+ * Calls Vercel Gateway API to analyze Reddit posts using Haiku model
  * Returns filtered and ranked trend ideas
  */
 export async function analyzeWithAI(posts: RedditPost[]): Promise<TrendIdea[]> {
-  const versalKey = process.env.VERSAL_KEY;
-  const versalApiUrl = process.env.VERSAL_API_URL || 'https://api.versal.ai/v1/chat/completions';
+  const apiKey = process.env.API_GATEWAY;
+  const apiUrl = process.env.API_GATEWAY_URL || 'https://api.vercel.com/v1/ai';
 
-  if (!versalKey) {
-    console.warn('VERSAL_KEY not configured, skipping AI analysis');
+  if (!apiKey) {
+    console.warn('API_GATEWAY not configured, skipping AI analysis');
     return [];
   }
 
@@ -48,12 +48,12 @@ Handle errors: If data parse fails, output {error: "description"}.
 Input data: ${JSON.stringify(redditData, null, 2)}`;
 
   try {
-    // Call Versal Gateway API (OpenAI-compatible format)
-    const response = await fetch(versalApiUrl, {
+    // Call Vercel Gateway API (OpenAI-compatible format)
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${versalKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'claude-3-haiku-20240307', // Haiku model as specified
@@ -68,7 +68,7 @@ Input data: ${JSON.stringify(redditData, null, 2)}`;
     });
 
     if (!response.ok) {
-      throw new Error(`Versal API error: ${response.status}`);
+      throw new Error(`Vercel Gateway API error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -78,7 +78,7 @@ Input data: ${JSON.stringify(redditData, null, 2)}`;
     const content = data.choices?.[0]?.message?.content;
     
     if (!content) {
-      console.error('Invalid response format from Versal API');
+      console.error('Invalid response format from Vercel Gateway API');
       return [];
     }
 

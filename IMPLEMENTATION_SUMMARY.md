@@ -11,7 +11,7 @@ This document summarizes the successful implementation of the Reddit Trend Scann
 A fully functional API endpoint (`/api/scan`) that:
 1. Fetches hot posts from Reddit (r/SaaS, r/indiehackers, r/SideProject, r/Entrepreneur)
 2. Filters posts from the last 24 hours with minimum engagement (10+ upvotes, 3+ comments)
-3. Analyzes trends using AI (Haiku model via Versal Gateway)
+3. Analyzes trends using AI (Haiku model via Vercel Gateway)
 4. Sends formatted notifications to Slack
 5. Runs automatically every hour via Vercel cron
 
@@ -20,7 +20,7 @@ A fully functional API endpoint (`/api/scan`) that:
 **API & Core Logic:**
 - `/app/api/scan/route.ts` - Main API endpoint with error handling
 - `/lib/reddit.ts` - Reddit API integration using public JSON API
-- `/lib/versal.ts` - Versal Gateway integration for AI analysis
+- `/lib/vercel-gateway.ts` - Vercel Gateway integration for AI analysis
 - `/lib/slack.ts` - Slack webhook notification system
 - `/lib/types.ts` - TypeScript type definitions
 
@@ -65,12 +65,12 @@ A fully functional API endpoint (`/api/scan`) that:
 ### Environment Variables Required
 
 **Required for Production:**
-- `VERSAL_KEY` - Versal Gateway API key
+- `API_GATEWAY` - Vercel Gateway API key
 - `SLACK_WEBHOOK` - Slack webhook URL
 - `CRON_SECRET` - Random secret for endpoint protection
 
 **Optional:**
-- `VERSAL_API_URL` - Custom Versal API endpoint (has default)
+- `API_GATEWAY_URL` - Custom Vercel Gateway API endpoint (has default)
 
 ### Next Steps for Deployment
 
@@ -83,14 +83,14 @@ A fully functional API endpoint (`/api/scan`) that:
 ### Cost Estimation
 
 - **Vercel Pro**: ~$20/month (required for cron jobs)
-- **Versal API**: ~$0.01-0.05 per scan (Haiku model)
+- **Vercel Gateway API**: ~$0.01-0.05 per scan (Haiku model)
 - **Total**: ~$21-22/month for 24/7 automated scanning
 
 ### Compliance with Requirements
 
 ✅ Use Vercel cron for hourly runs (configured in vercel.json)
 ✅ Fetch Reddit data using direct JSON API (cleaner than snoowrap)
-✅ Call Haiku model via Versal Gateway for filtering/ranking
+✅ Call Haiku model via Vercel Gateway for filtering/ranking
 ✅ Output top trends as JSON
 ✅ Ping Slack with results
 ✅ Handle errors gracefully

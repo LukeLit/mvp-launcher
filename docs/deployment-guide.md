@@ -17,12 +17,12 @@ vercel --prod
 In your Vercel project dashboard, add these environment variables:
 
 **Required:**
-- `VERSAL_KEY` - Your Versal Gateway API key for AI analysis
+- `API_GATEWAY` - Your Vercel Gateway API key for AI analysis
 - `SLACK_WEBHOOK` - Your Slack webhook URL for notifications
 - `CRON_SECRET` - Random secret string to protect the /api/scan endpoint
 
 **Optional:**
-- `VERSAL_API_URL` - Custom Versal API URL (defaults to https://api.versal.ai/v1/chat/completions)
+- `API_GATEWAY_URL` - Custom Vercel Gateway API URL (defaults to https://api.vercel.com/v1/ai)
 
 ### 3. Verify Cron Job
 
@@ -80,7 +80,7 @@ curl -X POST YOUR_SLACK_WEBHOOK \
 
 ### AI analysis not working?
 
-1. Verify `VERSAL_KEY` is set correctly
+1. Verify `API_GATEWAY` is set correctly
 2. Check the API URL is correct (default or custom)
 3. Review Vercel function logs for API errors
 
@@ -94,7 +94,7 @@ curl -X POST YOUR_SLACK_WEBHOOK \
 ## Cost Estimate
 
 - **Vercel Pro**: ~$20/month (required for cron jobs)
-- **Versal API**: ~$0.01-0.05 per scan (using Haiku model)
+- **Vercel Gateway API**: ~$0.01-0.05 per scan (using Haiku model)
 - **Total**: ~$21-22/month for 24/7 automated scanning
 
 ## Support

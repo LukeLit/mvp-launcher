@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchRedditPosts, filterRecentPosts } from '@/lib/reddit';
-import { analyzeWithAI } from '@/lib/versal';
+import { analyzeWithAI } from '@/lib/vercel-gateway';
 import { notifySlack } from '@/lib/slack';
 import { ScanResult } from '@/lib/types';
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     const recentPosts = filterRecentPosts(posts);
     console.log(`✅ Filtered to ${recentPosts.length} qualifying posts`);
 
-    // Step 3: Analyze with AI (Haiku via Versal Gateway)
+    // Step 3: Analyze with AI (Haiku via Vercel Gateway)
     const trends = await analyzeWithAI(recentPosts);
     console.log(`🤖 AI identified ${trends.length} trend ideas`);
 

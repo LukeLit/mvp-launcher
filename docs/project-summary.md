@@ -1,7 +1,7 @@
 ### MVP Launcher Project Summary
 
 #### Overview
-This project aims to create a semi-automated system for identifying trending micro-SaaS ideas from Reddit, validating them via pre-order landing pages, and building/deploying MVP web apps. The goal is self-sustaining income: pre-orders fund development, with minimal manual oversight. Built on Vercel (Pro account) using Next.js, integrated with AI agents (via Versal Gateway for models like Haiku for scanning, DeepSeek for code gen), GitHub for repos/PRs, Slack for notifications, and Stripe for payments. Target: Hands-off operation where you only greenlight ideas and QA final MVPs.
+This project aims to create a semi-automated system for identifying trending micro-SaaS ideas from Reddit, validating them via pre-order landing pages, and building/deploying MVP web apps. The goal is self-sustaining income: pre-orders fund development, with minimal manual oversight. Built on Vercel (Pro account) using Next.js, integrated with AI agents (via Vercel Gateway for models like Haiku for scanning, DeepSeek for code gen), GitHub for repos/PRs, Slack for notifications, and Stripe for payments. Target: Hands-off operation where you only greenlight ideas and QA final MVPs.
 
 #### Core Flow
 1. **Trend Scanning (Hourly Cron)**:
@@ -31,8 +31,8 @@ This project aims to create a semi-automated system for identifying trending mic
 
 #### Tech Stack & Integrations
 - **Framework**: Next.js 15 (App Router, TypeScript).
-- **Hosting/Deploy**: Vercel Pro (env vars for keys: VERSAL_KEY, REDDIT_CLIENT_ID, SLACK_WEBHOOK, STRIPE_KEYS).
-- **AI Models**: Route via Versal Gateway—Haiku (cheap scanning/summarizing), DeepSeek V2 (code/landing gen, cheap/free tier).
+- **Hosting/Deploy**: Vercel Pro (env vars for keys: API_GATEWAY, SLACK_WEBHOOK, STRIPE_KEYS).
+- **AI Models**: Route via Vercel Gateway—Haiku (cheap scanning/summarizing), DeepSeek V2 (code/landing gen, cheap/free tier).
 - **Automation**: Vercel cron jobs (/api/scan hourly), GitHub Actions (auto-merge/test PRs on approval), webhooks (Slack replies trigger builds).
 - **Data/External**: Reddit API (snoowrap or JSON fetch), Stripe for payments, optional Midjourney for images.
 - **Cost Controls**: Free tiers where possible (Vercel previews, DeepSeek); under $20 for initial 10 MVPs.

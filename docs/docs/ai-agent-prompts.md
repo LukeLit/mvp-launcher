@@ -1,5 +1,5 @@
 Expanded AI Agent Prompts for MVP Launcher
-Based on the project summary, I've expanded the key AI agent prompts below. These are designed to be copy-paste ready for your Versal Gateway or similar setup, with more detail for clarity, error-handling, and optimization. I've included placeholders for your specific keys/configs, and structured them for models like Haiku (cheap, fast tasks) or DeepSeek V2 (code generation). Each prompt includes:
+Based on the project summary, I've expanded the key AI agent prompts below. These are designed to be copy-paste ready for your Vercel Gateway or similar setup, with more detail for clarity, error-handling, and optimization. I've included placeholders for your specific keys/configs, and structured them for models like Haiku (cheap, fast tasks) or DeepSeek V2 (code generation). Each prompt includes:
 
 Model Recommendation: Based on cost/efficiency.
 Input Variables: What to feed in (e.g., from cron or user input).

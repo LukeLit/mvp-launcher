@@ -1,65 +1,278 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { TrendIdea, ScanResult } from '@/lib/types';
+import TrendsTable from '@/components/TrendsTable';
 
 export default function Home() {
+  const [trends, setTrends] = useState<TrendIdea[]>([]);
+  const [lastScan, setLastScan] = useState<string>('');
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [selectedTrend, setSelectedTrend] = useState<TrendIdea | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  // Load cached trends on mount
+  useEffect(() => {
+    const cached = localStorage.getItem('trends');
+    const cachedTime = localStorage.getItem('lastScan');
+    if (cached) {
+      setTrends(JSON.parse(cached));
+    }
+    if (cachedTime) {
+      setLastScan(cachedTime);
+    }
+  }, []);
+
+  const runScan = async () => {
+    setIsScanning(true);
+    setError('');
+
+    try {
+      console.log('🔍 Starting manual scan...');
+      const response = await fetch('/api/scan', {
+        method: 'POST',
+      });
+
+      console.log(`📡 Response status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        console.error('❌ Scan failed:', errorMsg);
+        throw new Error(`Scan failed: ${errorMsg}`);
+      }
+
+      const data: ScanResult = await response.json();
+      console.log('✅ Scan complete:', data);
+
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setTrends(data.trends);
+        setLastScan(data.timestamp);
+        
+        // Cache results
+        localStorage.setItem('trends', JSON.stringify(data.trends));
+        localStorage.setItem('lastScan', data.timestamp);
+        
+        console.log(`📊 Found ${data.trends.length} trends`);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to scan';
+      console.error('❌ Error:', errorMessage);
+      setError(errorMessage);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleBuildLanding = (trend: TrendIdea) => {
+    setSelectedTrend(trend);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedTrend(null);
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    if (!timestamp) return 'Never';
+    try {
+      return new Date(timestamp).toLocaleString();
+    } catch {
+      return timestamp;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
+            Reddit Trend Scanner
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Discover trending micro-SaaS ideas from Reddit
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Controls */}
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <button
+              onClick={runScan}
+              disabled={isScanning}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {isScanning ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Scanning...
+                </span>
+              ) : (
+                'Run Scan'
+              )}
+            </button>
+
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              Last scan: {formatTimestamp(lastScan)}
+            </div>
+          </div>
+
+          <div className="text-sm text-zinc-600 dark:text-zinc-400">
+            {trends.length} {trends.length === 1 ? 'trend' : 'trends'} found
+          </div>
         </div>
-      </main>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-start gap-2">
+              <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-red-800 dark:text-red-200 text-sm font-medium">
+                  Error: {error}
+                </p>
+                <details className="mt-2">
+                  <summary className="text-xs text-red-700 dark:text-red-300 cursor-pointer hover:underline">
+                    Debugging tips
+                  </summary>
+                  <div className="mt-2 text-xs text-red-700 dark:text-red-300 space-y-1 pl-4">
+                    <p>• Check browser console (F12) for detailed logs</p>
+                    <p>• Verify API endpoint is accessible at /api/scan</p>
+                    <p>• Check Vercel function logs if deployed</p>
+                    <p>• Ensure environment variables are set (API_GATEWAY, SLACK_WEBHOOK)</p>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Trends Table */}
+        <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+          <TrendsTable trends={trends} onBuildLanding={handleBuildLanding} />
+        </div>
+
+        {/* Build Landing Modal */}
+        {showModal && selectedTrend && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-zinc-900 rounded-lg max-w-2xl w-full p-6 border border-zinc-200 dark:border-zinc-800">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
+                Build Landing Page
+              </h2>
+
+              <div className="mb-6 space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Idea
+                  </label>
+                  <p className="text-zinc-900 dark:text-zinc-100">
+                    {selectedTrend.idea}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Summary
+                  </label>
+                  <p className="text-zinc-900 dark:text-zinc-100">
+                    {selectedTrend.summary}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Engagement Score
+                    </label>
+                    <p className="text-zinc-900 dark:text-zinc-100">
+                      {selectedTrend.score}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Suggested Pricing
+                    </label>
+                    <p className="text-zinc-900 dark:text-zinc-100">
+                      {selectedTrend.suggested_pricing}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Reddit Post
+                  </label>
+                  <a
+                    href={selectedTrend.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline block"
+                  >
+                    {selectedTrend.url}
+                  </a>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <strong>Note:</strong> Landing page generation API endpoint not
+                  yet implemented. This will trigger the Landing Page Generator
+                  from the AI agent prompts.
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={closeModal}
+                  disabled
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
+                >
+                  Generate Landing Page (Coming Soon)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info Footer */}
+        <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          <p>
+            Scans r/SaaS, r/indiehackers, r/SideProject, and r/Entrepreneur for
+            trending ideas
+          </p>
+          <p className="mt-1">
+            Auto-scans hourly via Vercel cron • Manual scan available anytime
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

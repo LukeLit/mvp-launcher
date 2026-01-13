@@ -4,24 +4,11 @@ import { NextResponse } from 'next/server';
 // This endpoint scans Reddit for trending micro-SaaS ideas
 export async function GET() {
   try {
-    // Check for required environment variables
-    const apiGatewayKey = process.env.API_GATEWAY_KEY;
-    // Note: These would be used in production for Reddit API authentication
-    // const redditClientId = process.env.REDDIT_CLIENT_ID;
-    // const redditClientSecret = process.env.REDDIT_CLIENT_SECRET;
-
-    if (!apiGatewayKey) {
-      return NextResponse.json(
-        { error: 'API_GATEWAY_KEY not configured' },
-        { status: 500 }
-      );
-    }
-
     // Mock implementation for now - returns sample trends
     // In production, this would:
-    // 1. Authenticate with Reddit API
+    // 1. Authenticate with Reddit API using REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET
     // 2. Scan target subreddits (r/SaaS, r/indiehackers, r/SideProject)
-    // 3. Filter posts with AI (Haiku) for micro-SaaS ideas
+    // 3. Filter posts with AI (Haiku via API_GATEWAY_KEY) for micro-SaaS ideas
     // 4. Rank and return top 3-5 ideas
 
     const mockTrends = [

@@ -1,6 +1,9 @@
 import { put, list } from '@vercel/blob';
 import type { LogEntry, TokenUsage } from '@/types/chat';
 
+// Default model for cost estimation fallback
+const DEFAULT_MODEL = 'claude-3-haiku-20240307';
+
 // Cost estimation based on model pricing (approximate)
 const MODEL_COSTS = {
   'claude-3-haiku-20240307': {
@@ -18,7 +21,7 @@ const MODEL_COSTS = {
 };
 
 export function estimateCost(model: string, tokenUsage: TokenUsage): number {
-  const costs = MODEL_COSTS[model as keyof typeof MODEL_COSTS] || MODEL_COSTS['claude-3-haiku-20240307'];
+  const costs = MODEL_COSTS[model as keyof typeof MODEL_COSTS] || MODEL_COSTS[DEFAULT_MODEL];
   const inputCost = tokenUsage.promptTokens * costs.input;
   const outputCost = tokenUsage.completionTokens * costs.output;
   return inputCost + outputCost;

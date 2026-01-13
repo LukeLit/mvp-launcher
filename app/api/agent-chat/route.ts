@@ -85,8 +85,21 @@ Current system status:
 
     const data = await response.json();
     
-    // Extract the generated content and usage
-    const content = data.content[0].text;
+    // Extract the generated content and usage with validation
+    if (!data.content || !Array.isArray(data.content) || data.content.length === 0) {
+      console.error('Invalid response format from API Gateway:', data);
+      await logToBlob(createLogEntry(
+        'error',
+        'Invalid response format from AI service',
+        { response: data }
+      ));
+      return NextResponse.json(
+        { error: 'Invalid response from AI service' },
+        { status: 500 }
+      );
+    }
+
+    const content = data.content[0]?.text || '';
     const usage: TokenUsage = {
       promptTokens: data.usage?.input_tokens || 0,
       completionTokens: data.usage?.output_tokens || 0,

@@ -46,3 +46,98 @@ This project aims to create a semi-automated system for identifying trending mic
 - Focus on web tools (JS/TS/React/Next), self-hosted on Vercel (scale to Pro if needed).
 - Evergreen: Recurring subs cover hosting/tokens; kill non-converting ideas fast.
 - Test Iteratively: Scan + ping first, then layer builds.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- Vercel account (Pro recommended for cron jobs)
+- Versal Gateway API key for AI analysis
+- Slack webhook URL for notifications
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Copy environment variables template
+cp .env.example .env.local
+
+# Edit .env.local with your API keys
+```
+
+### Required Environment Variables
+
+```bash
+VERSAL_KEY=your_versal_api_key_here
+SLACK_WEBHOOK=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+CRON_SECRET=your_random_secret_here  # Optional but recommended
+```
+
+### Development
+
+```bash
+# Run development server
+npm run dev
+
+# Open http://localhost:3000
+
+# Test the scan endpoint
+curl http://localhost:3000/api/scan
+```
+
+### Deployment
+
+1. **Deploy to Vercel:**
+   ```bash
+   vercel deploy --prod
+   ```
+
+2. **Configure Environment Variables:**
+   - Go to your Vercel project settings
+   - Add the required environment variables
+   - Redeploy if needed
+
+3. **Verify Cron Job:**
+   - Check Vercel dashboard → Project → Settings → Cron
+   - The `/api/scan` route should run hourly (0 * * * *)
+   - Monitor logs in Vercel dashboard
+
+## Features Implemented
+
+✅ **Reddit Trend Scanner** (`/api/scan`)
+- Fetches hot posts from r/SaaS, r/indiehackers, r/SideProject, r/Entrepreneur
+- Filters posts from last 24 hours with min 10 upvotes and 3 comments
+- AI analysis using Haiku via Versal Gateway
+- Slack notifications with formatted trends
+- Hourly automated scans via Vercel cron
+- Comprehensive error handling
+
+## Project Structure
+
+```
+├── app/
+│   ├── api/
+│   │   └── scan/
+│   │       └── route.ts          # Main scan API endpoint
+│   ├── layout.tsx
+│   └── page.tsx
+├── lib/
+│   ├── reddit.ts                 # Reddit API integration
+│   ├── versal.ts                 # Versal Gateway AI integration
+│   ├── slack.ts                  # Slack webhook notifications
+│   └── types.ts                  # TypeScript type definitions
+├── docs/
+│   ├── api-scan-readme.md        # API documentation
+│   ├── project-summary.md
+│   └── docs/
+│       └── ai-agent-prompts.md
+├── vercel.json                   # Vercel cron configuration
+└── .env.example                  # Environment variables template
+```
+
+## API Documentation
+
+See [docs/api-scan-readme.md](docs/api-scan-readme.md) for detailed API documentation.

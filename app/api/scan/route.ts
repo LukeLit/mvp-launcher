@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
+import { getSettings } from '@/lib/settings';
 
 // Reddit Trend Scanner API Route
 // This endpoint scans Reddit for trending micro-SaaS ideas
 export async function GET() {
   try {
+    // Check if scanning is enabled in admin settings
+    const settings = await getSettings();
+    if (!settings.scanEnabled) {
+      return NextResponse.json({
+        success: false,
+        error: 'Scanning is currently disabled. Enable it in admin settings.',
+        data: []
+      }, { status: 403 });
+    }
     // Mock implementation for now - returns sample trends
     // In production, this would:
     // 1. Authenticate with Reddit API using REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET

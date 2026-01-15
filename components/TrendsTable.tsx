@@ -25,13 +25,16 @@ export default function TrendsTable({ initialTrends = [] }: TrendsTableProps) {
       const response = await fetch('/api/scan');
       
       if (!response.ok) {
-        throw new Error('Failed to scan trends');
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to scan trends');
       }
 
       const result = await response.json();
       
       if (result.success) {
         setTrends(result.data);
+      } else {
+        throw new Error(result.error || 'Failed to scan trends');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to scan trends');
